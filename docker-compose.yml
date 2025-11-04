@@ -1,0 +1,45 @@
+services:
+  web:
+    build: .
+    working_dir: /app          
+    command: python -m app.app           
+    ports:
+      - "5000:5000"
+    environment:
+      WEBHOOK_SECRET: randomWord
+      FLASK_ENV: development
+      PYTHONPATH: /app
+    volumes:
+      - .:/app          # Mount all source code
+      - weward_data:/app/data   # Named volume for persistent data
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  worker:
+    build: .
+    working_dir: /app
+    command: python -m  app.worker
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PYTHONPATH: /app
+    volumes:
+      - .:/app          # Mount all source code
+      - weward_data:/app/data   # Named volume for persistent data
+    depends_on:
+      - redis
+      - web
+    
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+volumes:
+  weward_data:

@@ -1,0 +1,9 @@
+flask
+redis
+rq
+pytest
+pytest-flask
+fakeredis
+Flask-SQLAlchemy
+sqLAlchemy
+sqlalchemy.orm
